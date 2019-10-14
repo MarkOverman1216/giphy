@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Animal Buttons</title>
+</head>
+
+<body>
+  <div id="buttons">
+    <button id="searchGif" gif="javascript">Javascript</button>
+    <button id="searchGif" gif="html">html</button>
+    <button id="searchGif" gif="css">css</button>
+  </div>
+  <form id="movie-form">
+    <label for="gif-input">Add a GIF, Yo!</label>
+    <input type="text" id="gif-input"><br>
+
+    <input id="add-gif" type="submit" value="Add a GIF, Yo!">
+  </form>
+  <div id="gifs-appear-here">
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    $(document).on("click", ".gif", function () {
+      var state = this.getAttribute('data-state')
+      if (state === 'still') {
+        this.setAttribute('src', this.getAttribute('data-animate'))
+        this.setAttribute('data-state', 'animate')
+      } else if (state === 'animate') {
+        this.setAttribute('src', this.getAttribute('data-still'))
+        this.setAttribute('data-state', 'still')
+      }
+    })
+    $(document).on("click", "#searchGif", function (event) {
+      event.preventDefault();
+      var gif = $(this).attr("gif");
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+        gif + "&api_key=BkaUZZWcFij6J7AoQj3WtPb1R2p9O6V9&limit=10";
+
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      }).then(function (response) {
+        console.log(response.data[0]);
+        response.data.forEach(result => {
+          $("#gifs-appear-here").prepend($(`<div><p>Rating: ${result.rating}</p><img src="${result.images.fixed_height_still.url}" class="gif" data-still="${result.images.fixed_height_still.url}" data-animate="${result.images.fixed_height.url}" data-state="still"></img></div>`))
+        });
+
+
+      });
+    });
+    $("#add-gif").off('click')
+    $("#add-gif").on('click', function (event) {
+      event.preventDefault();
+      console.log($('#gif-input').val().trim())
+      $("#buttons").append(`<button id="searchGif" gif="${$('#gif-input').val().trim()}">${$('#gif-input').val().trim()}</button>`)
+    })
+  </script>
+</body>
+
+</html>
